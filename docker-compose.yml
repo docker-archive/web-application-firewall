@@ -1,0 +1,23 @@
+version: '3.3'
+
+services:
+
+  web-app:
+    image: microsoft/iis:nanoserver
+    networks:
+      - app-net
+
+  waf:
+    image: waf
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - web-app
+    networks:
+      - app-net
+
+networks:
+  app-net:
+    external:
+      name: nat
