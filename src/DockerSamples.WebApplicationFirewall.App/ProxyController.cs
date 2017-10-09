@@ -31,7 +31,7 @@ namespace DockerSamples.WebApplicationFirewall.App
             var listenPort = _config["Proxy:ListenPort"];
             var targetServer = _config["Proxy:TargetServer"];
             var targetPort = _config["Proxy:TargetPort"];
-            _logger.LogInformation("Proxy config - listen port: {0}, target server: {1}, targetPort: {2}", listenPort, targetServer, targetPort);
+            _logger.LogInformation($"Proxy config - listen port: {listenPort}, target server: {targetServer}, targetPort: {targetPort}");
                         
             var endPoint = new TransparentProxyEndPoint(IPAddress.Any, int.Parse(listenPort), false);            
             _server.AddEndPoint(endPoint);
@@ -56,13 +56,14 @@ namespace DockerSamples.WebApplicationFirewall.App
         
         public async Task OnRequest(object sender, SessionEventArgs e)
         {
-            _logger.LogDebug("Proxying request URL: {0}", e.WebSession.Request.Url);
+            _logger.LogDebug($"Proxying request URL: {e.WebSession.Request.Url}");
 
             foreach(var attackCheck in _attackChecks)
             {
-                if (attackCheck.IsSuspect(e.WebSession.Request))
+                if (await attackCheck.IsSuspect(e))
                 {
                     await attackCheck.BlockRequest(e);
+                    _logger.LogWarning($"** Blocked potential attack, type: {attackCheck.AttackName} **");
                 }
             }
         }

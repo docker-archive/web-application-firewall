@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
 using Titanium.Web.Proxy.EventArguments;
-using Titanium.Web.Proxy.Http;
 
 namespace DockerSamples.WebApplicationFirewall.App.AttackCheck
 {
@@ -20,10 +19,19 @@ namespace DockerSamples.WebApplicationFirewall.App.AttackCheck
             get { return "SQL Injection"; }
         }
 
-        public bool IsSuspect(Request request)
+        public async Task<bool> IsSuspect(SessionEventArgs session)
         {
-            //TODO - rule implementation, POST type and values contain SQL operators
-            return request.RequestUri.PathAndQuery.Contains("sql");
+            if (session.WebSession.Request.Method == "POST" && session.WebSession.Request.HasBody)
+            {
+                var body = await session.GetRequestBodyAsString();
+                body = WebUtility.UrlDecode(body);
+                //basic check for SQL injection string:
+                if (body.Contains("--") || body.Contains("/*"))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public async Task BlockRequest(SessionEventArgs session)

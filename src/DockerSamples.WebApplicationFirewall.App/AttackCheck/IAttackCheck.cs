@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using Titanium.Web.Proxy.EventArguments;
-using Titanium.Web.Proxy.Http;
 
 namespace DockerSamples.WebApplicationFirewall.App.AttackCheck
 {
@@ -8,7 +7,7 @@ namespace DockerSamples.WebApplicationFirewall.App.AttackCheck
     {
         string AttackName { get; }
 
-        bool IsSuspect(Request incomingRequest);
+        Task<bool> IsSuspect(SessionEventArgs session);
 
         Task BlockRequest(SessionEventArgs session);
     }
