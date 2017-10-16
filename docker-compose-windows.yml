@@ -8,10 +8,12 @@ services:
       - app-net
 
   waf:
-    image: waf
+    image: dockersamples/web-application-firewall:nanoserver
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: docker/windows/nanoserver/Dockerfile
+    ports:
+      - "80"
     depends_on:
       - web-app
     networks:

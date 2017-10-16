@@ -1,0 +1,23 @@
+version: '3.3'
+
+services:
+
+  web-app:
+    image: nginx:alpine
+    networks:
+      - app-net
+
+  waf:
+    image: dockersamples/web-application-firewall:jessie
+    build:
+      context: .
+      dockerfile: docker/linux/jessie/Dockerfile
+    ports:
+      - "80"
+    depends_on:
+      - web-app
+    networks:
+      - app-net
+
+networks:
+  app-net:
